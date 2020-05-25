@@ -1,0 +1,12 @@
+---
+bind_packages:
+  - bind9
+  - bind9utils
+  - bind9-doc
+bind_zone_dir: "{{ bind_config_dir }}/zones"
+bind_config_file: /etc/bind/bind.conf
+bind_service: bind9
+config_dirs:
+  - "{{ bind_config_dir }}"
+  - "{{ bind_zone_dir }}"
+...

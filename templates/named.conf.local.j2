@@ -1,0 +1,14 @@
+// // Do any local configuration here //
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+include "/etc/bind/rndc.key";
+
+{% for bind_zones in bqb_zones %}
+zone "{{ bind_zones.zone }}" {
+    type master;
+    file "{{ bind_zone_dir }}/{{ bind_zones.file }}"; # zone file path
+    allow-transfer { {{ secondary_dns }}; };             # ns2 private IP address - secondary
+};
+{% endfor %}

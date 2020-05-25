@@ -1,0 +1,12 @@
+# roles/bind/handlers/main.yml
+---
+- name: restart bind
+  service:
+    name: "{{ bind_service }}"
+    state: "{{ (bind_global_server_state | default('started') == 'started') | ternary('restarted', 'stopped') }}"
+
+- name: restart apparmor
+  service:
+    name: apparmor
+    state: restarted
+...

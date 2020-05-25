@@ -1,0 +1,6 @@
+---
+bind_config_dir: /etc/bind
+bind_global_server_state: started
+bind_key_dir: "{{ bind_config_dir }}"
+bind_packages_state: "present"
+...

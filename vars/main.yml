@@ -1,0 +1,25 @@
+---
+ext_dns: 8.8.4.4
+router1_dns: 192.168.1.1
+secondary_dns: 192.168.9.1
+bqb_zones:
+  - zone: ccr.benqubits.org
+    file: db.ccr.benqubits.org
+    transfer: "{{ secondary_dns }}"
+config_files:
+  - named.conf
+  - named.conf.default-zones
+bqb_cnfg_files:
+  - named.conf.local
+  - named.conf.options
+nameservers:
+  - 127.0.0.1
+  - 192.168.1.1
+  - 192.168.9.1
+token_keys:
+  - bind.keys
+  - rndc.key
+zone_config_files:
+  - db.172.16.8
+  - db.ccr.benqubits.org
+...

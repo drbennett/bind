@@ -1,0 +1,23 @@
+# The bind.keys file is used to override the built-in DNSSEC trust anchors
+# which are included as part of BIND 9.  The only trust anchors it contains
+# are for the DNS root zone (".").  Trust anchors for any other zones MUST
+# be configured elsewhere; if they are configured here, they will not be
+# recognized or used by named.
+#
+# The built-in trust anchors are provided for convenience of configuration.
+# They are not activated within named.conf unless specifically switched on.
+# To use the built-in key, use "dnssec-validation auto;" in the
+# named.conf options.  Without this option being set, the keys in this
+# file are ignored.
+#
+# This file is NOT expected to be user-configured.
+#
+# These keys are current as of October 2017.  If any key fails to
+# initialize correctly, it may have expired.  In that event you should
+# replace this file with a current version.  The latest version of
+# bind.keys can always be obtained from ISC at https://www.isc.org/bind-keys.
+#
+# See https://data.iana.org/root-anchors/root-anchors.xml
+# for current trust anchor information for the root zone.
+
+managed-keys {};

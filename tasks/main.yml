@@ -1,0 +1,106 @@
+---
+# roles/bind/tasks/main.yml
+- name: Load distro-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "{{ default }}.yml"
+  tags: bind
+
+- name: Install packages
+  package:
+    name: "{{ bind_packages }}"
+    state: "{{ bind_packages_state }}"
+  tags: bind
+
+- name: Set config directory perms
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 02755
+  loop: "{{ config_dirs }}"
+  tags: bind
+
+- name: Install keys
+  copy:
+    src: etc/bind/{{ item }}
+    dest: "{{ bind_key_dir }}/{{ item }}"
+  loop: "{{ token_keys }}"
+  tags: bind
+
+- name: Define default environment variables
+  copy:
+    src: etc/default/bind9
+    dest: "/etc/default/bind9"
+  tags: bind
+
+- name: Install config files (files)
+  copy:
+    src: etc/bind/
+    dest: "{{ bind_config_dir }}/"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: "dhcpd -t -cf %s"
+  loop: "{{ config_files }}"
+  notify: restart bind
+  tags: bind
+
+- name: Install bqb config files (files)
+  copy:
+    src: "etc/bind/{{ ns_type }}/"
+    dest: "{{ bind_config_dir }}/"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: "dhcpd -t -cf %s"
+  loop: "{{ bqb_cnfg_files }}"
+  notify: restart bind
+  tags: bind
+
+# - name: Install config files (templates)
+#   template:
+#     src: "{{ item }}.j2"
+#     dest: "{{ bind_config_dir }}/{{ item }}"
+#     owner: root
+#     group: root
+#     mode: 0644
+#     # validate: "dhcpd -t -cf %s"
+#   loop:
+#     - "{{ config_files }}"
+#     - "{{ zone_config_files }}"
+#   notify: restart bind
+#   tags: bind
+
+- name: Install zone definition files (files)
+  copy:
+    src: etc/bind/zones/
+    dest: "{{ bind_zone_dir }}/"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: "dhcpd -t -cf %s"
+  loop: "{{ zone_config_files }}"
+  notify: restart bind
+  tags: bind
+  when: ns_type == "master"
+
+# - name: Install zone definition files
+#   template:
+#     src: "{{ item }}.j2"
+#     dest: "{{ bind_zone_dir }}/db.{{ item }}"
+#     owner: root
+#     group: root
+#     mode: 0644
+#     # validate: "dhcpd -t -cf %s"
+#   loop: "{{ zone_files }}"
+#   tags: bind
+
+- name: "Ensure service is {{ bind_global_server_state | default('started') }}"
+  service:
+    name: "{{ bind_service }}"
+    state: "{{ bind_global_server_state | default('started') }}"
+    enabled: true
+  tags: bind
+...
